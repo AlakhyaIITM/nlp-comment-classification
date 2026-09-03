@@ -2,18 +2,16 @@
 
 An end-to-end machine learning project for classifying user-generated comments into predefined categories using Natural Language Processing, feature engineering, feature selection, and supervised learning.
 
-> **Best validation accuracy: 90.64%**
+> **Best verified validation accuracy: 90.64%**
 
-## Project Highlights
+## What This Project Demonstrates
 
-- 198,000 training samples and 102,000 test samples
-- TF-IDF with unigrams and bigrams
-- 20,000 initial text features reduced to 5,000 using SelectKBest + chi-square
-- Numerical metadata integrated with text features
-- Categorical metadata encoded with OneHotEncoder
-- Class imbalance addressed with class-weighted Logistic Regression
-- Multiple models and feature configurations evaluated
-- Stratified train/validation split with `random_state=42`
+- NLP feature engineering with TF-IDF unigrams and bigrams
+- Sparse high-dimensional feature selection with chi-square statistics
+- Fusion of text features with numerical and categorical metadata
+- Handling class imbalance with class-weighted Logistic Regression
+- Comparative evaluation of multiple classical ML approaches
+- Reproducible validation using a stratified split and fixed random state
 
 ## Dataset
 
@@ -27,31 +25,45 @@ test.csv
 
 The dataset is **not included** in this repository.
 
-The training data contains 198,000 rows and 15 columns; the test data contains 102,000 rows and 14 columns. The data combines comment text with numerical and categorical metadata.
+| Split | Rows | Columns |
+|---|---:|---:|
+| Train | 198,000 | 15 |
+| Test | 102,000 | 14 |
+
+The training data combines comment text with numerical and categorical metadata.
 
 ## Methodology
 
 ```text
-Raw Data
-   │
-   ├── Text ──────────────► TF-IDF (20,000 features)
-   │                              │
-   │                              ▼
-   │                     SelectKBest + Chi-square
-   │                              │
-   │                              ▼
-   │                       5,000 selected features
-   │
-   └── Structured Data ──► Scaling / One-Hot Encoding
-                                  │
-                                  ▼
+                         ┌─────────────────────┐
+                         │      Raw Data       │
+                         └──────────┬──────────┘
+                                    │
+                  ┌─────────────────┴─────────────────┐
+                  │                                   │
+                  ▼                                   ▼
+          ┌───────────────┐                   ┌────────────────┐
+          │ Comment Text  │                   │ Structured Data│
+          └───────┬───────┘                   └───────┬────────┘
+                  │                                   │
+                  ▼                                   ▼
+          TF-IDF: 20,000                   Scaling / One-Hot
+                  │                                   │
+                  ▼                                   │
+       SelectKBest + Chi-square                       │
+                  │                                   │
+                  ▼                                   │
+          5,000 text features                         │
+                  │                                   │
+                  └──────────────┬────────────────────┘
+                                 ▼
                          Feature Fusion
-                                  │
-                                  ▼
-                    Class-Weighted Logistic Regression
-                                  │
-                                  ▼
-                           Final Prediction
+                                 │
+                                 ▼
+                Class-Weighted Logistic Regression
+                                 │
+                                 ▼
+                         Final Prediction
 ```
 
 ### Text Representation
@@ -65,11 +77,9 @@ TfidfVectorizer(
 )
 ```
 
-The use of unigrams and bigrams allows the model to capture individual terms as well as short multi-word patterns.
+Unigrams capture individual terms while bigrams capture short multi-word patterns.
 
 ### Numerical Features
-
-The notebook uses:
 
 ```text
 emoticon_1
@@ -86,15 +96,13 @@ Numerical features are standardized with `StandardScaler` before feature fusion.
 
 ### Categorical Features
 
-The notebook encodes:
-
 ```text
 race
 religion
 gender
 ```
 
-using:
+These features are encoded with:
 
 ```python
 OneHotEncoder(
@@ -114,7 +122,7 @@ SelectKBest(
 )
 ```
 
-This represents a **75% reduction** in the TF-IDF feature space.
+This reduces the text feature space by **75%** before fusion with structured features.
 
 ## Models Explored
 
@@ -129,7 +137,7 @@ The notebook evaluates several approaches, including:
 - Hyperparameter-tuned Logistic Regression
 - Truncated SVD as an alternative dimensionality-reduction experiment
 
-The final selected approach is **class-weighted Logistic Regression** using selected TF-IDF features with numerical feature fusion.
+The strongest verified configuration is **class-weighted Logistic Regression** using selected TF-IDF features with numerical feature fusion.
 
 ## Results
 
@@ -139,20 +147,22 @@ The final selected approach is **class-weighted Logistic Regression** using sele
 | Test samples | 102,000 |
 | Initial TF-IDF features | 20,000 |
 | Selected TF-IDF features | 5,000 |
-| TF-IDF feature reduction | 75% |
-| Best validation accuracy | **90.64%** |
+| Feature-space reduction | 75% |
+| Best verified validation accuracy | **90.64%** |
 | Final model | Logistic Regression |
 | Feature selection | SelectKBest + chi-square |
 | Validation split | Stratified |
 | Random state | 42 |
 
-The detailed experiments and outputs are available in the notebook.
+Detailed experiments and notebook outputs are available in `nlp_comment_classification.ipynb`.
 
-> **Important:** 90.64% is validation accuracy. It is not being presented as test-set accuracy or as a Kaggle leaderboard score.
+> **Important:** 90.64% is validation accuracy. It is **not** being presented as test-set accuracy or as a Kaggle leaderboard score.
+
+Detailed configuration is documented in [`results/model_results.md`](results/model_results.md).
 
 ## Class Imbalance
 
-The final Logistic Regression configuration uses class weights:
+The final Logistic Regression configuration uses:
 
 ```python
 {
@@ -163,7 +173,7 @@ The final Logistic Regression configuration uses class weights:
 }
 ```
 
-This gives greater training importance to selected minority classes.
+The weighting gives greater training importance to selected minority classes.
 
 ## Repository Structure
 
@@ -181,26 +191,22 @@ nlp-comment-classification/
 
 ## Installation
 
-Clone the repository:
-
 ```bash
 git clone https://github.com/AlakhyaIITM/nlp-comment-classification.git
 cd nlp-comment-classification
-```
 
-Create and activate a virtual environment:
+python -m venv .venv
+```
 
 ### Windows
 
 ```bash
-python -m venv .venv
 .venv\Scripts\activate
 ```
 
 ### macOS / Linux
 
 ```bash
-python -m venv .venv
 source .venv/bin/activate
 ```
 
@@ -226,13 +232,13 @@ nlp_comment_classification.ipynb
 
 ### Dataset Path
 
-The notebook was developed in Kaggle and expects the dataset under:
+The notebook was developed in Kaggle and expects:
 
 ```python
 DATA_PATH = "/kaggle/input"
 ```
 
-Therefore, it is directly reproducible in its original Kaggle environment. To run locally, download the permitted dataset files and update `DATA_PATH` to the local dataset directory.
+For local execution, obtain the permitted dataset files and update `DATA_PATH` to the local dataset directory.
 
 ## Kaggle
 
@@ -242,22 +248,35 @@ The project was originally developed and executed on Kaggle.
 
 https://www.kaggle.com/code/alakhyasarkar/23f1001050-notebook-t12026
 
-## Limitations
+## Reproducibility Notes
 
+- The validation split is stratified.
+- `random_state=42` is used for the documented validation setup.
 - The dataset is not redistributed with this repository.
-- The reported 90.64% figure is validation accuracy, not test-set accuracy.
-- The current notebook is Kaggle-oriented rather than packaged as a standalone application.
-- No trained model artifact is included; the notebook contains the training workflow.
+- No trained model artifact is committed; the notebook contains the training workflow.
+- The current implementation is Kaggle-oriented rather than packaged as a standalone application.
+
+## Limitations & Responsible Use
+
+The dataset contains demographic attributes such as race, religion, and gender. These variables can introduce fairness, privacy, and representational concerns. Model performance should therefore not be interpreted as evidence that the classifier is unbiased or suitable for high-stakes automated decisions.
+
+Other limitations include:
+
+- Only the documented validation result is claimed in this repository.
+- The test-set and leaderboard performance are not reported here.
+- The original dataset is not included.
+- The notebook is not currently packaged as a production inference pipeline.
 
 ## Future Improvements
 
-- Evaluate transformer-based text representations
-- Add word- and character-level features
-- Perform systematic hyperparameter optimization
 - Report precision, recall, and F1 by class
+- Add a confusion matrix and class-level error analysis
+- Compare word-level and character-level features
+- Perform systematic hyperparameter optimization
+- Evaluate transformer-based text representations
 - Investigate more robust imbalance-handling strategies
+- Package the final pipeline for reproducible inference
 - Build an inference API or interactive prediction interface
-- Package the final pipeline for deployment
 
 ## Author
 
