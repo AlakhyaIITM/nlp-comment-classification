@@ -631,7 +631,7 @@ nlp-comment-classification/
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nlp-comment-classification.git
+git clone https://github.com/AlakhyaIITM/nlp-comment-classification.git
 ```
 
 Move into the project directory:
@@ -791,23 +791,3 @@ Indian Institute of Technology Madras
 This project is licensed under the MIT License.
 
 See the `LICENSE` file for details.
-
-````
-
-### One important change I would make before you upload it
-
-I **would not blindly keep the `requirements.txt` and `results/model_results.md` structure unless we actually create those files**. The README should accurately reflect the repository.
-
-For your first GitHub version, I recommend this simpler structure:
-
-```text
-nlp-comment-classification/
-│
-├── README.md
-├── nlp_comment_classification.ipynb
-├── requirements.txt
-├── LICENSE
-├── .gitignore
-└── data/
-    └── README.md
-````
