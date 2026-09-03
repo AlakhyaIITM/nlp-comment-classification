@@ -1,6 +1,6 @@
 # NLP Comment Classification System
 
-An end-to-end machine learning project for classifying user-generated comments into predefined categories using NLP, feature engineering, feature selection, and supervised learning.
+An end-to-end machine learning project for classifying user-generated comments into predefined categories using Natural Language Processing, feature engineering, feature selection, and supervised learning.
 
 > **Best validation accuracy: 90.64%**
 
@@ -54,7 +54,7 @@ Raw Data
                            Final Prediction
 ```
 
-### Text representation
+### Text Representation
 
 ```python
 TfidfVectorizer(
@@ -65,7 +65,9 @@ TfidfVectorizer(
 )
 ```
 
-### Numerical features
+The use of unigrams and bigrams allows the model to capture individual terms as well as short multi-word patterns.
+
+### Numerical Features
 
 The notebook uses:
 
@@ -82,7 +84,7 @@ disability
 
 Numerical features are standardized with `StandardScaler` before feature fusion.
 
-### Categorical features
+### Categorical Features
 
 The notebook encodes:
 
@@ -92,17 +94,27 @@ religion
 gender
 ```
 
-using `OneHotEncoder(handle_unknown="ignore", sparse_output=True)`.
+using:
 
-### Feature selection
+```python
+OneHotEncoder(
+    handle_unknown="ignore",
+    sparse_output=True
+)
+```
+
+### Feature Selection
 
 The 20,000-dimensional TF-IDF representation is reduced to 5,000 features using:
 
 ```python
-SelectKBest(score_func=chi2, k=5000)
+SelectKBest(
+    score_func=chi2,
+    k=5000
+)
 ```
 
-That is a **75% reduction** in the TF-IDF feature space.
+This represents a **75% reduction** in the TF-IDF feature space.
 
 ## Models Explored
 
@@ -134,7 +146,9 @@ The final selected approach is **class-weighted Logistic Regression** using sele
 | Validation split | Stratified |
 | Random state | 42 |
 
-The detailed experiments, outputs, and model evaluation are available in the notebook.
+The detailed experiments and outputs are available in the notebook.
+
+> **Important:** 90.64% is validation accuracy. It is not being presented as test-set accuracy or as a Kaggle leaderboard score.
 
 ## Class Imbalance
 
@@ -157,7 +171,7 @@ This gives greater training importance to selected minority classes.
 nlp-comment-classification/
 │
 ├── README.md
-├── 23f1001050-notebook-t12026.ipynb
+├── nlp_comment_classification.ipynb
 ├── requirements.txt
 ├── LICENSE
 ├── .gitignore
@@ -207,30 +221,31 @@ jupyter notebook
 Open:
 
 ```text
-23f1001050-notebook-t12026.ipynb
+nlp_comment_classification.ipynb
 ```
 
-### Dataset path
+### Dataset Path
 
-The notebook was developed in Kaggle and currently expects the dataset under:
+The notebook was developed in Kaggle and expects the dataset under:
 
 ```python
 DATA_PATH = "/kaggle/input"
 ```
 
-Therefore, the notebook is directly reproducible in its original Kaggle environment. To run it locally, download the permitted dataset files and update `DATA_PATH` to their local directory.
+Therefore, it is directly reproducible in its original Kaggle environment. To run locally, download the permitted dataset files and update `DATA_PATH` to the local dataset directory.
 
 ## Kaggle
 
 The project was originally developed and executed on Kaggle.
 
 **Kaggle Notebook:**
+
 https://www.kaggle.com/code/alakhyasarkar/23f1001050-notebook-t12026
 
 ## Limitations
 
 - The dataset is not redistributed with this repository.
-- The reported 90.64% figure is **validation accuracy**, not test-set accuracy.
+- The reported 90.64% figure is validation accuracy, not test-set accuracy.
 - The current notebook is Kaggle-oriented rather than packaged as a standalone application.
 - No trained model artifact is included; the notebook contains the training workflow.
 
