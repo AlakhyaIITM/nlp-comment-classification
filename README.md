@@ -2,68 +2,68 @@
 
 An end-to-end machine learning project for classifying user-generated comments into predefined categories using Natural Language Processing, feature engineering, feature selection, and supervised learning.
 
-> **Best verified validation accuracy: 90.64%**
+> **Best validation accuracy: 90.64%**
 
-## What This Project Demonstrates
+## Project Highlights
 
-- NLP feature engineering with TF-IDF unigrams and bigrams
-- Sparse high-dimensional feature selection with chi-square statistics
-- Fusion of text features with numerical and categorical metadata
-- Handling class imbalance with class-weighted Logistic Regression
-- Comparative evaluation of multiple classical ML approaches
-- Reproducible validation using a stratified split and fixed random state
+- 198,000 training samples and 102,000 test samples
+- TF-IDF with unigrams and bigrams
+- 20,000 initial text features reduced to 5,000 using SelectKBest + chi-square
+- Numerical metadata integrated with text features
+- Categorical metadata encoded with OneHotEncoder
+- Class imbalance addressed with class-weighted Logistic Regression
+- Multiple models and feature configurations evaluated
+- Stratified train/validation split with `random_state=42`
+- Dataset included in the repository as split CSV files to keep individual files below GitHub's browser upload limit
 
 ## Dataset
 
-The original Kaggle environment contains:
+The project dataset contains comment text together with numerical and categorical metadata.
+
+The complete dataset is stored in the [`data/`](data/) directory. Because the original `train.csv` and `test.csv` files were too large for convenient GitHub browser uploads, they are split into multiple CSV files without removing or changing rows.
 
 ```text
-Sample.csv
-train.csv
-test.csv
+data/
+├── train_part_1.csv
+├── train_part_2.csv
+├── train_part_3.csv
+├── train_part_4.csv
+├── test_part_1.csv
+├── test_part_2.csv
+└── Sample.csv
 ```
 
-The dataset is **not included** in this repository.
+The complete datasets contain:
 
-| Split | Rows | Columns |
-|---|---:|---:|
-| Train | 198,000 | 15 |
-| Test | 102,000 | 14 |
+- Training data: **198,000 rows, 15 columns**
+- Test data: **102,000 rows, 14 columns**
+- Submission sample: **102,000 rows**
 
-The training data combines comment text with numerical and categorical metadata.
+The training columns include comment text, numerical metadata, categorical metadata, and the target `label`.
 
 ## Methodology
 
 ```text
-                         ┌─────────────────────┐
-                         │      Raw Data       │
-                         └──────────┬──────────┘
-                                    │
-                  ┌─────────────────┴─────────────────┐
-                  │                                   │
-                  ▼                                   ▼
-          ┌───────────────┐                   ┌────────────────┐
-          │ Comment Text  │                   │ Structured Data│
-          └───────┬───────┘                   └───────┬────────┘
-                  │                                   │
-                  ▼                                   ▼
-          TF-IDF: 20,000                   Scaling / One-Hot
-                  │                                   │
-                  ▼                                   │
-       SelectKBest + Chi-square                       │
-                  │                                   │
-                  ▼                                   │
-          5,000 text features                         │
-                  │                                   │
-                  └──────────────┬────────────────────┘
-                                 ▼
+Raw Data
+   │
+   ├── Text ──────────────► TF-IDF (20,000 features)
+   │                              │
+   │                              ▼
+   │                     SelectKBest + Chi-square
+   │                              │
+   │                              ▼
+   │                       5,000 selected features
+   │
+   └── Structured Data ──► Scaling / One-Hot Encoding
+                                  │
+                                  ▼
                          Feature Fusion
-                                 │
-                                 ▼
-                Class-Weighted Logistic Regression
-                                 │
-                                 ▼
-                         Final Prediction
+                                  │
+                                  ▼
+                    Class-Weighted Logistic Regression
+                                  │
+                                  ▼
+                           Final Prediction
 ```
 
 ### Text Representation
@@ -77,9 +77,11 @@ TfidfVectorizer(
 )
 ```
 
-Unigrams capture individual terms while bigrams capture short multi-word patterns.
+The use of unigrams and bigrams allows the model to capture individual terms as well as short multi-word patterns.
 
 ### Numerical Features
+
+The notebook uses:
 
 ```text
 emoticon_1
@@ -96,20 +98,15 @@ Numerical features are standardized with `StandardScaler` before feature fusion.
 
 ### Categorical Features
 
+The notebook encodes:
+
 ```text
 race
 religion
 gender
 ```
 
-These features are encoded with:
-
-```python
-OneHotEncoder(
-    handle_unknown="ignore",
-    sparse_output=True
-)
-```
+using `OneHotEncoder` with unknown-category handling.
 
 ### Feature Selection
 
@@ -122,7 +119,7 @@ SelectKBest(
 )
 ```
 
-This reduces the text feature space by **75%** before fusion with structured features.
+This represents a **75% reduction** in the TF-IDF feature space.
 
 ## Models Explored
 
@@ -137,7 +134,7 @@ The notebook evaluates several approaches, including:
 - Hyperparameter-tuned Logistic Regression
 - Truncated SVD as an alternative dimensionality-reduction experiment
 
-The strongest verified configuration is **class-weighted Logistic Regression** using selected TF-IDF features with numerical feature fusion.
+The final selected approach is **class-weighted Logistic Regression** using selected TF-IDF features with numerical feature fusion.
 
 ## Results
 
@@ -147,22 +144,20 @@ The strongest verified configuration is **class-weighted Logistic Regression** u
 | Test samples | 102,000 |
 | Initial TF-IDF features | 20,000 |
 | Selected TF-IDF features | 5,000 |
-| Feature-space reduction | 75% |
-| Best verified validation accuracy | **90.64%** |
+| TF-IDF feature reduction | 75% |
+| Best validation accuracy | **90.64%** |
 | Final model | Logistic Regression |
 | Feature selection | SelectKBest + chi-square |
 | Validation split | Stratified |
 | Random state | 42 |
 
-Detailed experiments and notebook outputs are available in `nlp_comment_classification.ipynb`.
+Detailed experiments and outputs are available in [`nlp_comment_classification.ipynb`](nlp_comment_classification.ipynb), while the final configuration is summarized in [`results/model_results.md`](results/model_results.md).
 
-> **Important:** 90.64% is validation accuracy. It is **not** being presented as test-set accuracy or as a Kaggle leaderboard score.
-
-Detailed configuration is documented in [`results/model_results.md`](results/model_results.md).
+> **Important:** 90.64% is validation accuracy. It is not being presented as test-set accuracy or as a Kaggle leaderboard score.
 
 ## Class Imbalance
 
-The final Logistic Regression configuration uses:
+The final Logistic Regression configuration uses class weights:
 
 ```python
 {
@@ -173,117 +168,57 @@ The final Logistic Regression configuration uses:
 }
 ```
 
-The weighting gives greater training importance to selected minority classes.
+This gives greater training importance to selected minority classes.
 
 ## Repository Structure
 
 ```text
 nlp-comment-classification/
 │
+├── data/
+│   ├── train_part_1.csv
+│   ├── train_part_2.csv
+│   ├── train_part_3.csv
+│   ├── train_part_4.csv
+│   ├── test_part_1.csv
+│   ├── test_part_2.csv
+│   ├── Sample.csv
+│   └── README.md
+├── results/
+│   └── model_results.md
 ├── README.md
 ├── nlp_comment_classification.ipynb
 ├── requirements.txt
 ├── LICENSE
-├── .gitignore
-└── results/
-    └── model_results.md
+└── .gitignore
 ```
 
 ## Installation
 
+Clone the repository and install the required dependencies:
+
 ```bash
 git clone https://github.com/AlakhyaIITM/nlp-comment-classification.git
 cd nlp-comment-classification
-
-python -m venv .venv
-```
-
-### Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-### macOS / Linux
-
-```bash
-source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-## Running the Notebook
-
-Start Jupyter:
+Launch Jupyter Notebook:
 
 ```bash
 jupyter notebook
 ```
 
-Open:
+Then open `nlp_comment_classification.ipynb`.
 
-```text
-nlp_comment_classification.ipynb
-```
+## Reproducibility
 
-### Dataset Path
+The main validation experiments use a stratified train/validation split with `random_state=42`. The notebook contains the complete preprocessing, feature engineering, model training, and evaluation workflow.
 
-The notebook was developed in Kaggle and expects:
+## Responsible Use
 
-```python
-DATA_PATH = "/kaggle/input"
-```
-
-For local execution, obtain the permitted dataset files and update `DATA_PATH` to the local dataset directory.
-
-## Kaggle
-
-The project was originally developed and executed on Kaggle.
-
-**Kaggle Notebook:**
-
-https://www.kaggle.com/code/alakhyasarkar/23f1001050-notebook-t12026
-
-## Reproducibility Notes
-
-- The validation split is stratified.
-- `random_state=42` is used for the documented validation setup.
-- The dataset is not redistributed with this repository.
-- No trained model artifact is committed; the notebook contains the training workflow.
-- The current implementation is Kaggle-oriented rather than packaged as a standalone application.
-
-## Limitations & Responsible Use
-
-The dataset contains demographic attributes such as race, religion, and gender. These variables can introduce fairness, privacy, and representational concerns. Model performance should therefore not be interpreted as evidence that the classifier is unbiased or suitable for high-stakes automated decisions.
-
-Other limitations include:
-
-- Only the documented validation result is claimed in this repository.
-- The test-set and leaderboard performance are not reported here.
-- The original dataset is not included.
-- The notebook is not currently packaged as a production inference pipeline.
-
-## Future Improvements
-
-- Report precision, recall, and F1 by class
-- Add a confusion matrix and class-level error analysis
-- Compare word-level and character-level features
-- Perform systematic hyperparameter optimization
-- Evaluate transformer-based text representations
-- Investigate more robust imbalance-handling strategies
-- Package the final pipeline for reproducible inference
-- Build an inference API or interactive prediction interface
-
-## Author
-
-**Alakhya Sarkar**  
-B.S. in Data Science and Applications  
-Indian Institute of Technology Madras
+This project is intended as a machine learning and NLP portfolio project. Because the dataset includes demographic attributes such as race, religion, gender, and disability, model outputs should be interpreted carefully. High validation accuracy does not by itself establish fairness, safety, or suitability for real-world moderation decisions.
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is released under the MIT License. See [`LICENSE`](LICENSE) for details.
